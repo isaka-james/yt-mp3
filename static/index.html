@@ -1,0 +1,503 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube MP3 Downloader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+        .playlist-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .playlist-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .playlist-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .playlist-scroll::-webkit-scrollbar-thumb {
+            background: #9333ea;
+            border-radius: 10px;
+        }
+        .playlist-scroll::-webkit-scrollbar-thumb:hover {
+            background: #7e22ce;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 min-h-screen">
+    <div class="container mx-auto px-4 py-12">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-white mb-4">
+                🎵 YouTube MP3 Downloader
+            </h1>
+            <p class="text-purple-200 text-lg">
+                Convert YouTube videos & playlists to high-quality MP3 files
+            </p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Input Section -->
+            <div class="p-8 bg-gradient-to-r from-purple-50 to-indigo-50">
+                <div class="space-y-4">
+                    <label class="block text-gray-700 font-semibold text-lg mb-2">
+                        Enter YouTube URL (Video or Playlist)
+                    </label>
+                    <div class="flex gap-3">
+                        <input 
+                            type="text" 
+                            id="urlInput"
+                            placeholder="https://www.youtube.com/watch?v=... or https://www.youtube.com/playlist?list=..." 
+                            class="flex-1 px-4 py-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
+                        />
+                        <button 
+                            onclick="getVideoInfo()" 
+                            id="infoBtn"
+                            class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 active:scale-95 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Get Info
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-600 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        Supports both individual videos and entire playlists
+                    </p>
+                </div>
+            </div>
+
+            <!-- Single Video Info Section -->
+            <div id="videoInfo" class="hidden p-8 border-t border-gray-200">
+                <div class="flex gap-6">
+                    <img 
+                        id="thumbnail" 
+                        class="w-40 h-28 object-cover rounded-lg shadow-md"
+                        alt="Video thumbnail"
+                    />
+                    <div class="flex-1">
+                        <h3 id="videoTitle" class="text-xl font-bold text-gray-800 mb-2"></h3>
+                        <p class="text-gray-600 mb-1">
+                            <span class="font-semibold">Channel:</span> 
+                            <span id="uploader"></span>
+                        </p>
+                        <p class="text-gray-600 mb-1">
+                            <span class="font-semibold">Duration:</span> 
+                            <span id="duration"></span>
+                        </p>
+                        <p class="text-gray-600">
+                            <span class="font-semibold">Views:</span> 
+                            <span id="views"></span>
+                        </p>
+                    </div>
+                </div>
+                <button 
+                    onclick="startDownload()" 
+                    id="downloadBtn"
+                    class="w-full mt-6 px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-bold text-lg hover:from-green-600 hover:to-emerald-700 active:scale-95 transition-all shadow-lg hover:shadow-xl"
+                >
+                    Download MP3
+                </button>
+            </div>
+
+            <!-- Playlist Info Section -->
+            <div id="playlistInfo" class="hidden p-8 border-t border-gray-200">
+                <div class="mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-3 bg-purple-100 rounded-lg">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 id="playlistTitle" class="text-2xl font-bold text-gray-800"></h3>
+                            <p class="text-gray-600">
+                                <span class="font-semibold">Channel:</span> 
+                                <span id="playlistUploader"></span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 border-l-4 border-purple-500 p-4 mb-4">
+                        <p class="text-purple-800">
+                            <span class="font-bold" id="playlistCount"></span> videos will be downloaded
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="font-semibold text-gray-700 mb-3">Videos in playlist:</h4>
+                    <div id="playlistVideos" class="playlist-scroll space-y-2 bg-gray-50 rounded-lg p-4">
+                        <!-- Videos will be inserted here -->
+                    </div>
+                </div>
+
+                <button 
+                    onclick="startDownload()" 
+                    id="downloadPlaylistBtn"
+                    class="w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-bold text-lg hover:from-green-600 hover:to-emerald-700 active:scale-95 transition-all shadow-lg hover:shadow-xl"
+                >
+                    Download All as ZIP
+                </button>
+            </div>
+
+            <!-- Progress Section -->
+            <div id="progressSection" class="hidden p-8 border-t border-gray-200 bg-gray-50">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span id="progressStatus" class="text-gray-700 font-semibold"></span>
+                        <span id="progressPercent" class="text-purple-600 font-bold"></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
+                        <div 
+                            id="progressBar" 
+                            class="bg-gradient-to-r from-purple-500 to-indigo-500 h-4 rounded-full transition-all duration-300 ease-out"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                    <div id="progressDetails" class="text-sm text-gray-600 text-center"></div>
+                    <div id="playlistProgress" class="hidden mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-700">Progress:</span>
+                            <span id="videoCounter" class="font-semibold text-purple-600"></span>
+                        </div>
+                        <p id="currentVideoTitle" class="text-gray-600 text-sm truncate"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Section -->
+            <div id="successSection" class="hidden p-8 border-t border-gray-200 bg-green-50">
+                <div class="text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Download Complete!</h3>
+                    <p id="successMessage" class="text-gray-600 mb-6"></p>
+                    <button 
+                        onclick="downloadFile()" 
+                        class="px-8 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 active:scale-95 transition-all shadow-lg hover:shadow-xl"
+                    >
+                        💾 Download File
+                    </button>
+                    <button 
+                        onclick="resetForm()" 
+                        class="ml-3 px-8 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 active:scale-95 transition-all"
+                    >
+                        Download Another
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="errorSection" class="hidden p-8 border-t border-gray-200 bg-red-50">
+                <div class="text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-red-500 rounded-full mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Error Occurred</h3>
+                    <p id="errorMessage" class="text-gray-600 mb-6"></p>
+                    <button 
+                        onclick="resetForm()" 
+                        class="px-8 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 active:scale-95 transition-all"
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-purple-200">
+            <p class="text-sm">Made with ❤️ using FastAPI & Tailwind CSS</p>
+        </div>
+    </div>
+
+    <script>
+        let currentTaskId = null;
+        let currentFilename = null;
+        let progressInterval = null;
+        let isPlaylist = false;
+
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+
+        async function getVideoInfo() {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                showError('Please enter a YouTube URL');
+                return;
+            }
+
+            const infoBtn = document.getElementById('infoBtn');
+            infoBtn.disabled = true;
+            infoBtn.textContent = 'Loading...';
+
+            try {
+                const response = await fetch('/api/video-info', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to get video info');
+                }
+
+                if (data.is_playlist) {
+                    displayPlaylistInfo(data.info);
+                } else {
+                    displayVideoInfo(data.info);
+                }
+
+                hideSection('errorSection');
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                infoBtn.disabled = false;
+                infoBtn.textContent = 'Get Info';
+            }
+        }
+
+        function displayVideoInfo(info) {
+            isPlaylist = false;
+            document.getElementById('thumbnail').src = info.thumbnail;
+            document.getElementById('videoTitle').textContent = info.title;
+            document.getElementById('uploader').textContent = info.uploader;
+            document.getElementById('duration').textContent = formatDuration(info.duration);
+            document.getElementById('views').textContent = formatNumber(info.view_count);
+
+            showSection('videoInfo');
+            hideSection('playlistInfo');
+        }
+
+        function displayPlaylistInfo(info) {
+            isPlaylist = true;
+            document.getElementById('playlistTitle').textContent = info.title;
+            document.getElementById('playlistUploader').textContent = info.uploader;
+            document.getElementById('playlistCount').textContent = info.video_count;
+
+            const videosContainer = document.getElementById('playlistVideos');
+            videosContainer.innerHTML = '';
+
+            info.videos.forEach((video, index) => {
+                const videoElement = document.createElement('div');
+                videoElement.className = 'flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-purple-300 transition-colors';
+                videoElement.innerHTML = `
+                    <div class="flex-shrink-0 w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-semibold text-sm">
+                        ${index + 1}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-800 truncate">${video.title}</p>
+                        <p class="text-xs text-gray-500">${formatDuration(video.duration)}</p>
+                    </div>
+                `;
+                videosContainer.appendChild(videoElement);
+            });
+
+            hideSection('videoInfo');
+            showSection('playlistInfo');
+        }
+
+        async function startDownload() {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            document.getElementById('downloadBtn').disabled = true;
+            if (document.getElementById('downloadPlaylistBtn')) {
+                document.getElementById('downloadPlaylistBtn').disabled = true;
+            }
+            
+            showSection('progressSection');
+            hideSection('successSection');
+            hideSection('errorSection');
+
+            try {
+                const response = await fetch('/api/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to start download');
+                }
+
+                currentTaskId = data.task_id;
+                isPlaylist = data.is_playlist;
+                
+                if (isPlaylist) {
+                    showSection('playlistProgress');
+                }
+                
+                checkProgress();
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        async function checkProgress() {
+            if (!currentTaskId) return;
+
+            progressInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/progress/${currentTaskId}`);
+                    const data = await response.json();
+
+                    updateProgress(data);
+
+                    if (data.status === 'completed') {
+                        clearInterval(progressInterval);
+                        showSuccess(data.title, data.filename, data.is_playlist);
+                    } else if (data.status === 'error') {
+                        clearInterval(progressInterval);
+                        showError(data.message);
+                    }
+
+                } catch (error) {
+                    clearInterval(progressInterval);
+                    showError('Failed to check progress');
+                }
+            }, 500);
+        }
+
+        function updateProgress(data) {
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressStatus = document.getElementById('progressStatus');
+            const progressDetails = document.getElementById('progressDetails');
+
+            progressBar.style.width = `${data.percentage || 0}%`;
+            progressPercent.textContent = `${data.percentage || 0}%`;
+
+            if (data.is_playlist && data.total_videos) {
+                const videoCounter = document.getElementById('videoCounter');
+                const currentVideoTitle = document.getElementById('currentVideoTitle');
+                
+                videoCounter.textContent = `${data.current_video || 0} / ${data.total_videos}`;
+                
+                if (data.current_title) {
+                    currentVideoTitle.textContent = `Currently downloading: ${data.current_title}`;
+                }
+                
+                progressStatus.textContent = `Downloading Playlist (${data.current_video || 0}/${data.total_videos})`;
+            } else if (data.status === 'downloading') {
+                progressStatus.textContent = 'Downloading...';
+                if (data.speed) {
+                    const speedMB = (data.speed / 1024 / 1024).toFixed(2);
+                    progressDetails.textContent = `Speed: ${speedMB} MB/s | ETA: ${data.eta || 0}s`;
+                }
+            } else if (data.status === 'converting') {
+                progressStatus.textContent = 'Converting to MP3...';
+                progressDetails.textContent = 'Almost done!';
+            } else if (data.status === 'starting') {
+                progressStatus.textContent = 'Initializing...';
+                progressDetails.textContent = 'Preparing download...';
+            }
+        }
+
+        function showSuccess(title, filename, playlist = false) {
+            currentFilename = filename;
+            
+            if (playlist) {
+                document.getElementById('successMessage').textContent = `"${title}" playlist has been downloaded and packaged into a ZIP file!`;
+            } else {
+                document.getElementById('successMessage').textContent = `"${title}" has been converted successfully!`;
+            }
+            
+            showSection('successSection');
+            hideSection('progressSection');
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            showSection('errorSection');
+            hideSection('progressSection');
+            document.getElementById('downloadBtn').disabled = false;
+            if (document.getElementById('downloadPlaylistBtn')) {
+                document.getElementById('downloadPlaylistBtn').disabled = false;
+            }
+        }
+
+        function downloadFile() {
+            if (currentFilename) {
+                window.location.href = `/api/download-file/${currentFilename}`;
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('urlInput').value = '';
+            hideSection('videoInfo');
+            hideSection('playlistInfo');
+            hideSection('progressSection');
+            hideSection('successSection');
+            hideSection('errorSection');
+            hideSection('playlistProgress');
+            document.getElementById('downloadBtn').disabled = false;
+            if (document.getElementById('downloadPlaylistBtn')) {
+                document.getElementById('downloadPlaylistBtn').disabled = false;
+            }
+            currentTaskId = null;
+            currentFilename = null;
+            isPlaylist = false;
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+        }
+
+        function showSection(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function hideSection(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                getVideoInfo();
+            }
+        });
+    </script>
+</body>
+</html>
