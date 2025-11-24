@@ -1,165 +1,164 @@
-# 🎧 YT-MP3 Tool - For When You Want Music Without the Streaming Drama
+# 🎧 YT-MP3 Tool - Download Playlists Without The Drama
 
-Linux gang, this one's for you. Tired of `yay -S` installing 50 dependencies just to download a playlist? This tool gets straight to the point.
+When you find that fire playlist but it's stuck on YouTube 😤 This tool gets your music offline, no cap.
 
-## 🤔 What Even Is This?
+<details>
+<summary>🤔 <b>What even is this?</b> (click me)</summary>
 
-### The Two Scripts Explained:
+### Two scripts, zero headaches:
 
-**`mix.py`** - For when YouTube's algorithm hits different
+**`mix.py`** - For when YouTube's algorithm actually slaps
 - Downloads YouTube Mixes & Radio stations  
-- Like when you're listening to a song and YouTube goes "here's more stuff you'll probably vibe with"
-- Perfect for discovering new music without commitment
-- [What's a YouTube Mix?](https://www.google.com/search?q=what+is+youtube+mix)
+- That "My Mix" that somehow knows your vibe better than you
+- Perfect for when you're in your feels or need new music
 
-**`playlist.py`** - For your actual curated playlists
-- Downloads proper playlists (your Liked Songs, created playlists, etc.)
-- Uses parallel downloads because we're not in the Stone Age
-- Organizes everything properly like the organized king/queen you are
-- [Playlists vs Mixes](https://www.google.com/search?q=youtube+mix+vs+playlist)
+**`playlist.py`** - For your actual curated playlists  
+- Your Liked Songs, created playlists, the works
+- Downloads multiple songs at once because we're not in 2010
+- Organizes everything so you don't have 100 files called "audio.mp3"
 
-## 🎵 Supports Both YouTube & YouTube Music
+**Works with BOTH:**
+- `youtube.com` (the OG)
+- `music.youtube.com` (for the cultured folks)
 
-**This tool works with BOTH:**
-- `youtube.com` URLs (the regular YouTube we all know and love)
-- `music.youtube.com` URLs (YouTube Music, for the cultured folks)
+One tool to rule them all 💍
+</details>
 
-So whether you're grabbing from regular YouTube or YouTube Music - it just works. No separate tools needed.
-
-## 🚀 Installation (The Linux Way)
+## 🚀 Quick Start (Just Give Me The Commands)
 
 ```bash
-# You probably have Python, but just in case
-sudo pacman -S python python-pip  # Arch gang
-# or
-sudo apt install python3 python3-pip  # Debian/Ubuntu crew
+# For mixes (algorithm-generated playlists)
+python3 mix.py "your_youtube_mix_url" 25
 
-# The only dependency that matters
-pip install yt-dlp
-
-# Clone this bad boy
-git clone https://github.com/isaka-james/yt-mp3
-cd yt-mp3
-
-# Make them executable (because we're fancy)
-chmod +x mix.py playlist.py
+# For actual playlists (your Liked Songs, etc.)
+python3 playlist.py "your_playlist_url"
 ```
 
-## 🎯 Usage Examples That Actually Work
-
-### For Algorithm-Generated Mixes (Both Platforms):
-```bash
-# YouTube Music Mix
-./mix.py "https://music.youtube.com/watch?v=9XV2XGyn25k&list=RDAMVM9XV2XGyn25k" 25
-
-# Regular YouTube Mix  
-./mix.py "https://www.youtube.com/watch?v=SxAp27sFaIM&list=RDSxAp27sFaIM" 25
-```
-
-### For Your Actual Playlists (Both Platforms):
-```bash
-# YouTube Music Playlist
-./playlist.py "https://music.youtube.com/playlist?list=PLv1HTPB7i3ZZ9navMdw0GH1cpNY3gFB3N"
-
-# Regular YouTube Playlist
-./playlist.py "https://www.youtube.com/playlist?list=PLxyz123456789"
-```
-
-## 📁 Where Your Files Actually Go
+<details>
+<summary>📁 <b>Where my files go?</b></summary>
 
 ```
 downloads/
-├── "Chill Coding Mix"/          # Each mix/playlist gets its own folder
-│   ├── song1.mp3
-│   ├── song2.mp3
-│   └── ...
+├── "Vibe Check Mix"/
+│   ├── song_that_slaps.mp3
+│   └── another_banger.mp3
 └── "My Liked Songs"/
-    ├── that_banger.mp3
-    ├── another_banger.mp3
-    └── ...
+    ├── that_one_song.mp3
+    └── you_get_the_idea.mp3
 ```
 
-**Pro tip:** `cd downloads && ls -la` to see your loot. Or use `ranger` if you're extra.
+Each playlist gets its own folder. Your files won't be a hot mess 🔥
+</details>
 
-## 🧠 What's Actually Happening Under the Hood
+<details>
+<summary>🛠️ <b>Installation</b> (if you don't have it yet)</summary>
 
-- **`mix.py`**: Downloads sequentially (one song at a time) because mixes are for vibing, not rushing
-- **`playlist.py`**: Uses 3 parallel threads because your time is valuable  
-- **Both work with YouTube AND YouTube Music** - no separate tools needed
-- Automatically sanitizes filenames (no more `[Official Music Video].mp3` nonsense)
-- All files are proper MP3s ready for your music player of choice
-
-## 🐛 Common Issues & Fixes
-
-### "Command not found"
+### Normal Linux:
 ```bash
-python3 mix.py "your_url" 25  # Use python3 explicitly
+pip install yt-dlp
 ```
 
-### "ModuleNotFoundError: No module named 'yt_dlp'"
+### Kali/Protected Systems (when pip yells at you):
 ```bash
-pip install --user yt-dlp  # Sometimes pip needs the --user flag
+# Python venv to the rescue:
+python3 -m venv ~/yt-mp3-env
+source ~/yt-mp3-env/bin/activate
+pip install yt-dlp
+
+# Pro tip: Add to ~/.bashrc
+alias yt-env="source ~/yt-mp3-env/bin/activate"
 ```
 
-### "This URL is not working"
-- Make sure it's from `music.youtube.com` or `youtube.com` (both work!)
-- Check if the playlist is public  
-- Try copying the "Share" link instead of the address bar URL
+### Get the scripts:
+```bash
+git clone https://github.com/isaka-james/yt-mp3
+cd yt-mp3
+chmod +x mix.py playlist.py
+```
+</details>
 
-### "Downloads are slow af"
-- `playlist.py` already uses parallel downloads
-- For mixes, that's just how YouTube serves them ¯\\_(ツ)_/¯
-- Use `--max-workers 5` in the code if you want to get wild
+<details>
+<summary>🎯 <b>Real Examples That Actually Work</b></summary>
 
-## 🚀 Pro Tips for Power Users
+### Mixes (YouTube Radio):
+```bash
+python3 mix.py "https://music.youtube.com/watch?v=9XV2XGyn25k&list=RDAMVM9XV2XGyn25k" 25
+python3 mix.py "https://www.youtube.com/watch?v=SxAp27sFaIM&list=RDSxAp27sFaIM" 30
+```
+
+### Actual Playlists:
+```bash
+python3 playlist.py "https://music.youtube.com/playlist?list=PLv1HTPB7i3ZZ9navMdw0GH1cpNY3gFB3N"
+python3 playlist.py "https://www.youtube.com/playlist?list=PLxyz123456789"
+```
+
+**Pro tip:** Use the "Share" link from YouTube/YouTube Music for best results
+</details>
+
+<details>
+<summary>🐛 <b>Common Issues & Fixes</b></summary>
+
+### "externally-managed-environment" (Kali users):
+```bash
+python3 -m venv ~/yt-mp3-env
+source ~/yt-mp3-env/bin/activate
+pip install yt-dlp
+```
+
+### "Command not found":
+```bash
+python3 mix.py "url" 25  # Use python3 not python
+```
+
+### "Module not found":
+- Kali users: Make sure venv is activated
+- Others: `pip install --user yt-dlp`
+
+### "URL not working":
+- Make sure it's from youtube.com or music.youtube.com
+- Try the "Share" link instead of address bar
+- Check if playlist is public
+</details>
+
+<details>
+<summary>🚀 <b>Pro Tips</b> (for the power users)</summary>
 
 ```bash
-# Add to your .bashrc for quick access
+# Add to your .bashrc for instant access
 alias yt-mix="python3 /path/to/mix.py"
 alias yt-playlist="python3 /path/to/playlist.py"
 
-# Now you can just do:
-yt-mix "your_url" 20
-yt-playlist "your_playlist_url"
+# Kali users add this too:
+alias yt-env="source ~/yt-mp3-env/bin/activate"
+
+# Now just do:
+yt-mix "url" 20        # Normal Linux
+yt-env && yt-mix "url" # Kali
 ```
 
-**Want to customize?** The code is right there. Change `max_workers`, output directories, whatever. It's your party.
+**Customization?** The code is right there. Change threads, folders, whatever. It's your party 🎉
+</details>
 
-## ⚖️ Legal Stuff (The Boring Part)
+<details>
+<summary>🪟 <b>Windows Users Can Join Too</b></summary>
 
-- This is for personal use only
-- Don't be a dick and mass download copyrighted content  
-- Support artists when you can (streaming revenue still matters)
-- If you're a record label, please don't sue me I'm broke
-
-## 🎉 Why This Over Other Tools?
-
-- **No bloat**: 2 files, 1 dependency
-- **Actually works with both YouTube AND YouTube Music** - one tool to rule them all
-- **Proper file organization** (not just dumping everything in ~/Downloads)
-- **Parallel downloads** that don't nuke your CPU
-- **Written for Linux** by someone who actually uses Linux
-
----
-
-## 🪟 BTW Windows Users Can Use This Too
-
-Yeah yeah, we see you over there. You can join the party too:
+Yeah we see you:
 
 1. **Install Python** from [python.org](https://python.org)
-2. **Open Command Prompt** (yes, that black box you're scared of)  
-3. **Run these commands**:
+2. **Open Command Prompt** (that scary black box)
+3. **Run:**
 ```cmd
 pip install yt-dlp
-python mix.py "your_youtube_url" 25
+python mix.py "your_url" 25
 ```
 
-Same scripts, same vibe. Works with both YouTube and YouTube Music. No excuses.
+Same scripts, same vibe. No excuses.
+</details>
 
 ---
 
-**Made for the terminal warriors who just want their music without 15 layers of abstraction**
+**Made for when you just want your music without 15 layers of abstraction**
 
-*If this saved you from yet another Electron app, hit that star button ⭐*
+*If this saved you from subscription hell, hit that star ⭐*
 
-**Contributions welcome** - especially if you make the error messages even more sassy
+**PS:** Don't mass download copyrighted stuff. Support artists when you can 🎵
