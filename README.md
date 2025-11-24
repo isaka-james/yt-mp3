@@ -27,6 +27,9 @@ One tool to rule them all 💍
 ## 🚀 Quick Start (Just Give Me The Commands)
 
 ```bash
+# Our Magic Dependency (We can't write YT integration from scratch!)
+pip install yt-dlp
+
 # For mixes (algorithm-generated playlists)
 python3 mix.py "your_youtube_mix_url" 25
 
