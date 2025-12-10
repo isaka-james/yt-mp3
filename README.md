@@ -1,6 +1,8 @@
 # 🎧 YT-MP3 Tool - Download Playlists Without The Drama
 
 When you find that fire playlist but it's stuck on YouTube 😤 This tool gets your music offline, no cap.
+<img width="828" height="379" alt="image" src="https://github.com/user-attachments/assets/379ffe39-d2a4-4afe-b71c-3031934bd66c" />
+
 
 <details>
 <summary>🤔 <b>What even is this?</b> (click me)</summary>
